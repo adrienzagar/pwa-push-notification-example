@@ -4,6 +4,7 @@ let urlsToCache = [
   '/pokedex.json'
 ];
 
+
 // Fonction utilitaire pour formater l'ID avec des zéros devant
 function pad(num, size) {
   let padded = num.toString();
@@ -46,7 +47,6 @@ self.addEventListener('install', (e) => {
 
 self.addEventListener('fetch', (e) => {
   console.log(e)
-  debugger
   // Cache http and https only, skip unsupported chrome-extension:// and file://...
   if (!(
     e.request.url.startsWith('http:') || e.request.url.startsWith('https:')
