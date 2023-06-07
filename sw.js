@@ -1,7 +1,7 @@
 const CACHE_NAME = 'my-cache-v1';
 let urlsToCache = [
-  './index.html',
-  './pokedex.json'
+  '/index.html',
+  '/pokedex.json'
 ];
 
 // Fonction utilitaire pour formater l'ID avec des zéros devant
@@ -14,20 +14,21 @@ function pad(num, size) {
 }
 
 for (let i = 1; i <= 10; i++) {
-  let url = './thumbnails/' + String(i).padStart(3, '0') + '.png';
+  let url = '/thumbnails/' + String(i).padStart(3, '0') + '.png';
   urlsToCache.push(url);
 }
 
 console.log(urlsToCache)
+// debugger
 
-
-self.addEventListener('install', function(event) {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(function(cache) {
-        return cache.addAll(urlsToCache);
-      })
-      );
+self.addEventListener('install', (e) => {
+  console.log('[Service Worker] Install');
+  e.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    console.log('[Service Worker] Caching all: app shell and content');
+    console.log(cache)
+    await cache.addAll(urlsToCache);
+  })());
 });
 
 // self.addEventListener('fetch', function(event) {
@@ -44,6 +45,8 @@ self.addEventListener('install', function(event) {
 
 
 self.addEventListener('fetch', (e) => {
+  console.log(e)
+  debugger
   // Cache http and https only, skip unsupported chrome-extension:// and file://...
   if (!(
     e.request.url.startsWith('http:') || e.request.url.startsWith('https:')
@@ -53,10 +56,11 @@ self.addEventListener('fetch', (e) => {
 
 e.respondWith((async () => {
   const r = await caches.match(e.request);
+  console.log(r)
   console.log(`[Service Worker] Fetching resource: ${e.request.url}`);
   if (r) return r;
   const response = await fetch(e.request);
-  const cache = await caches.open(cacheName);
+  const cache = await caches.open(CACHE_NAME);
   console.log(`[Service Worker] Caching new resource: ${e.request.url}`);
   cache.put(e.request, response.clone());
   return response;
