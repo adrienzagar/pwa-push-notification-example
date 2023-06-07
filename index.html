@@ -9,10 +9,46 @@
   <link rel="manifest" href="./manifest.json" />
 </head>
 <body>
-  <div id="content"></div>
-  <button id="displayButton">Afficher le contenu</button>
-
+  <ul id="pokemon-list"></ul>
   <script>
+
+    fetch('pokedex.json')
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(data) {
+        const pokemonList = document.getElementById('pokemon-list');
+
+        data.forEach(function(pokemon) {
+          const listItem = document.createElement('li');
+          const image = document.createElement('img');
+
+          // Chargement de l'image correspondante au Pokémon
+          const imageURL = 'thumbnails/' + pad(pokemon.id, 3) + '.png';
+          image.src = imageURL;
+
+          // Affichage de l'ID et du nom du Pokémon
+          listItem.textContent = ' - Name: ' + pokemon.name.french + ' Tyoe : ' + pokemon.type;
+
+          // Ajout de l'image et de l'élément <li> à la liste
+          listItem.appendChild(image);
+          pokemonList.appendChild(listItem);
+        });
+      })
+      .catch(function(error) {
+        console.error('Une erreur s\'est produite lors du chargement du fichier JSON:', error);
+      });
+
+      // Fonction utilitaire pour formater l'ID avec des zéros devant
+      function pad(num, size) {
+        let padded = num.toString();
+        while (padded.length < size) {
+          padded = "0" + padded;
+        }
+        return padded;
+      }
+
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('./sw.js').then(function(registration) {
@@ -22,23 +58,12 @@
         });
       });
     }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      const displayButton = document.getElementById('displayButton');
-      const contentDiv = document.getElementById('content');
-
-      displayButton.addEventListener('click', function() {
-        if ('caches' in window) {
-          caches.match('./data.json').then(function(response) {
-            if (response) {
-              response.json().then(function(data) {
-                contentDiv.textContent = data.hello;
-              });
-            }
-          });
-        }
-      });
-    });
   </script>
 </body>
 </html>
+
+
+
+
+
+

@@ -1,13 +1,33 @@
+const CACHE_NAME = 'my-cache-v1';
+let urlsToCache = [
+  './index.html',
+  './pokedex.json'
+];
+
+// Fonction utilitaire pour formater l'ID avec des zéros devant
+function pad(num, size) {
+  let padded = num.toString();
+  while (padded.length < size) {
+    padded = "0" + padded;
+  }
+  return padded;
+}
+
+for (let i = 1; i <= 10; i++) {
+  let url = './thumbnails/' + String(i).padStart(3, '0') + '.png';
+  urlsToCache.push(url);
+}
+
+console.log(urlsToCache)
+
+
 self.addEventListener('install', function(event) {
   event.waitUntil(
-    caches.open('my-cache').then(function(cache) {
-      return cache.addAll([
-        './data.json', // Chemin vers le fichier JSON à mettre en cache
-        'index.html',
-        './pwa-icon.png'
-      ]);
-    })
-  );
+    caches.open(CACHE_NAME)
+      .then(function(cache) {
+        return cache.addAll(urlsToCache);
+      })
+      );
 });
 
 self.addEventListener('fetch', function(event) {
@@ -27,8 +47,7 @@ self.addEventListener('activate', function(event) {
     caches.keys().then(function(cacheNames) {
       return Promise.all(
         cacheNames.filter(function(cacheName) {
-          // Supprime les anciens caches sauf le cache actuel
-          return cacheName !== 'my-cache';
+          return cacheName !== CACHE_NAME;
         }).map(function(cacheName) {
           return caches.delete(cacheName);
         })
