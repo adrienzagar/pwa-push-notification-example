@@ -2,7 +2,9 @@ self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open('my-cache').then(function(cache) {
       return cache.addAll([
-        './data.json' // Chemin vers le fichier JSON à mettre en cache
+        './data.json', // Chemin vers le fichier JSON à mettre en cache
+        'index.html',
+        './pwa-icon.png'
       ]);
     })
   );
