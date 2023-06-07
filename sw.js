@@ -41,17 +41,26 @@ self.addEventListener('fetch', function(event) {
     })
   );
 });
-
 self.addEventListener('activate', function(event) {
-  event.waitUntil(
-    caches.keys().then(function(cacheNames) {
-      return Promise.all(
-        cacheNames.filter(function(cacheName) {
-          return cacheName !== CACHE_NAME;
-        }).map(function(cacheName) {
-          return caches.delete(cacheName);
-        })
-      );
-    })
-  );
+  // ...
+
+  // Ajoutez le code suivant pour activer le service worker lorsque vous êtes hors ligne
+  if (navigator.onLine) {
+    // Si le navigateur est en ligne, supprimez les anciens caches
+    event.waitUntil(
+      caches.keys().then(function(cacheNames) {
+        return Promise.all(
+          cacheNames.filter(function(cacheName) {
+            return cacheName !== CACHE_NAME;
+          }).map(function(cacheName) {
+            return caches.delete(cacheName);
+          })
+        );
+      })
+    );
+  } else {
+    // Si le navigateur est hors ligne, activez immédiatement le service worker
+    return self.clients.claim();
+  }
 });
+
