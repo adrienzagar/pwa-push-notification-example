@@ -7,7 +7,7 @@
   "description": "A PWA test",
   "icons": [
     {
-      "src": "images/touch/pwa-icon.png",
+      "src": "./pwa-icon.png",
       "sizes": "512x512",
       "type": "image/png"
     }
