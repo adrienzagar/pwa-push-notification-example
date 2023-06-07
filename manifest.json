@@ -1,0 +1,15 @@
+{
+  "name": "pwa",
+  "short_name": "pwa",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#fff",
+  "description": "A PWA test",
+  "icons": [
+    {
+      "src": "images/touch/pwa-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
