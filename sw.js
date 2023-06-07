@@ -30,37 +30,61 @@ self.addEventListener('install', function(event) {
       );
 });
 
-self.addEventListener('fetch', function(event) {
-  event.respondWith(
-    caches.match(event.request).then(function(response) {
-      if (response) {
-        return response;
-      } else {
-        return fetch(event.request);
-      }
-    })
-  );
-});
-self.addEventListener('activate', function(event) {
-  // ...
+// self.addEventListener('fetch', function(event) {
+//   event.respondWith(
+//     caches.match(event.request).then(function(response) {
+//       if (response) {
+//         return response;
+//       } else {
+//         return fetch(event.request);
+//       }
+//     })
+//   );
+// });
 
-  // Ajoutez le code suivant pour activer le service worker lorsque vous êtes hors ligne
-  if (navigator.onLine) {
-    // Si le navigateur est en ligne, supprimez les anciens caches
-    event.waitUntil(
-      caches.keys().then(function(cacheNames) {
-        return Promise.all(
-          cacheNames.filter(function(cacheName) {
-            return cacheName !== CACHE_NAME;
-          }).map(function(cacheName) {
-            return caches.delete(cacheName);
-          })
-        );
-      })
-    );
-  } else {
-    // Si le navigateur est hors ligne, activez immédiatement le service worker
-    return self.clients.claim();
+
+self.addEventListener('fetch', (e) => {
+  // Cache http and https only, skip unsupported chrome-extension:// and file://...
+  if (!(
+    e.request.url.startsWith('http:') || e.request.url.startsWith('https:')
+  )) {
+      return; 
   }
+
+e.respondWith((async () => {
+  const r = await caches.match(e.request);
+  console.log(`[Service Worker] Fetching resource: ${e.request.url}`);
+  if (r) return r;
+  const response = await fetch(e.request);
+  const cache = await caches.open(cacheName);
+  console.log(`[Service Worker] Caching new resource: ${e.request.url}`);
+  cache.put(e.request, response.clone());
+  return response;
+})());
 });
+
+// self.addEventListener('activate', function(event) {
+//   // ...
+
+//   // Ajoutez le code suivant pour activer le service worker lorsque vous êtes hors ligne
+//   if (navigator.onLine) {
+//     // Si le navigateur est en ligne, supprimez les anciens caches
+//     event.waitUntil(
+//       caches.keys().then(function(cacheNames) {
+//         return Promise.all(
+//           cacheNames.filter(function(cacheName) {
+//             return cacheName !== CACHE_NAME;
+//           }).map(function(cacheName) {
+//             return caches.delete(cacheName);
+//           })
+//         );
+//       })
+//     );
+//   } else {
+//     // Si le navigateur est hors ligne, activez immédiatement le service worker
+//     return self.clients.claim();
+//   }
+// });
+
+
 
